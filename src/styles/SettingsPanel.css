@@ -1,0 +1,46 @@
+.settings-panel{
+	text-align: center;
+	position: relative;
+
+	background-color: #191919;
+	box-shadow: 0px 0px 15px 2px black;
+}
+
+.settings-panel input[type=number]{
+	background-color: #141414;
+	color: white;
+	border: none;
+	border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+
+	text-align: center;
+	font-style: normal;
+	font-size: 100%;
+
+	width: 40%;
+	height: 25px;
+	-moz-appearance: textfield;
+}
+
+.settings-panel p{
+	display: inline-block;
+	margin-right: 7%;
+}
+
+.settings-panel button{
+	background-color: #3D5AFE;
+	border: none;
+	padding: 3% 13%;
+
+	cursor: pointer;
+
+	transition-duration: 0.3s;
+
+	position: absolute;
+	bottom: 4%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.settings-panel button:hover{
+	padding: 3% 15%;
+}

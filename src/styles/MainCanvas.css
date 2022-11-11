@@ -2,3 +2,7 @@
 	background-color: #191919;
 	box-shadow: 0px 0px 15px 2px black inset;
 }
+
+.main-canvas{
+	display: block;
+}

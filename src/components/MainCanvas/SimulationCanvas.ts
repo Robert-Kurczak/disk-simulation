@@ -12,7 +12,7 @@ class Disk{
 	constructor(radius: number, position: vector2, velocity: vector2, color: string){
 		this.radius = radius;
 		this.position = position;
-		this.velocity = velocity;
+		this.velocity = velocity
 		this.color = color;
 	}
 }
@@ -27,6 +27,18 @@ class SimulationCanvas{
 	private canvasCTX: CanvasRenderingContext2D;
 
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
+
+	private deltaT = 0.004;
+	private gConstant = 0.0000000000667;
+
+	private bigMass = {
+		position: {
+			x: 0,
+			y: 0
+		},
+
+		mass: 2e18
+	}
 
 	constructor(width: number, height: number, wrapperID: string, canvasClass: string){
 		this.width = width;
@@ -47,6 +59,9 @@ class SimulationCanvas{
 		
 		this.canvasWrapper.appendChild(this.canvasNode);
 		//------
+
+		this.bigMass.position.x = this.width / 2;
+		this.bigMass.position.y = this.height / 2;
 	}
 
 	//---Private methods---
@@ -61,8 +76,8 @@ class SimulationCanvas{
 			}
 
 			const randVelocity: vector2 = {
-				x: Math.random() * 4 - 2,
-				y: Math.random() * 4 - 2
+				x: Math.random() * 200 - 100,
+				y: Math.random() * 200 - 100
 			}
 
 			const color: string = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
@@ -97,39 +112,70 @@ class SimulationCanvas{
 			this.canvasCTX.clearRect(0, 0, this.width, this.height);
 			this.drawDisks(diskArray);
 
-			for(let i = 0; i < diskArray.length; i++){
-				const currentDisk: Disk = diskArray[i];
+			this.canvasCTX.beginPath();
+			this.canvasCTX.arc(this.bigMass.position.x, this.bigMass.position.y, 5, 0, 2 * Math.PI);
+			this.canvasCTX.fillStyle = "#ff0044";
+			this.canvasCTX.fill();
+
+			for(let disk of diskArray){
+
+				//distance vector between disk and big mass
+				let distanceVec: vector2 = {
+					x: this.bigMass.position.x - disk.position.x,
+					y: this.bigMass.position.y - disk.position.y
+				}
+
+				//value of distance vector
+				let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
+
+				//unit vector (versor) that show direction to big mass
+				let distanceVer: vector2 = {
+					x: distanceVec.x / distanceVal,
+					y: distanceVec.y / distanceVal
+				};
+
+				let acceleration: vector2 = {
+					x: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.x,
+					y: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.y
+				}
+
+				disk.velocity.x += acceleration.x * this.deltaT;
+				disk.velocity.y += acceleration.y * this.deltaT;
 
 				const potentialPosition: vector2 = {
-					x: currentDisk.position.x += currentDisk.velocity.x,
-					y: currentDisk.position.y += currentDisk.velocity.y
+					x: disk.position.x += disk.velocity.x * this.deltaT,
+					y: disk.position.y += disk.velocity.y * this.deltaT
 				}
 
 				//---Border collisions---
 				//x
-				if(potentialPosition.x + currentDisk.radius > this.width){
-					potentialPosition.x  = this.width - currentDisk.radius
-					currentDisk.velocity.x *= -1;
+				if(potentialPosition.x + disk.radius > this.width){
+					potentialPosition.x  = this.width - disk.radius;
+
+					disk.velocity.x *= -1;
 				}
-				else if(potentialPosition.x - currentDisk.radius < 0){
-					potentialPosition.x = currentDisk.radius;
-					currentDisk.velocity.x *= -1;
+				else if(potentialPosition.x - disk.radius < 0){
+					potentialPosition.x = disk.radius;
+
+					disk.velocity.x *= -1;
 				}
 
 				//y
-				if(potentialPosition.y + currentDisk.radius > this.height){
-					potentialPosition.y  = this.height - currentDisk.radius
-					currentDisk.velocity.y *= -1;
+				if(potentialPosition.y + disk.radius > this.height){
+					potentialPosition.y  = this.height - disk.radius
+
+					disk.velocity.y *= -1;
 				}
-				else if(potentialPosition.y - currentDisk.radius < 0){
-					potentialPosition.y = currentDisk.radius;
-					currentDisk.velocity.y *= -1;
+				else if(potentialPosition.y - disk.radius < 0){
+					potentialPosition.y = disk.radius;
+
+					disk.velocity.y *= -1;
 				}
 				//------
 
-				currentDisk.position = potentialPosition;
+				disk.position = potentialPosition;
 			}
-		}, 0);
+		}, this.deltaT * 1000);
 	}
 	//------
 

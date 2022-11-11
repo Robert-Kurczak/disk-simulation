@@ -1,4 +1,7 @@
 .settings-panel{
+	width: 22em;
+	padding: 1% 2%;
+
 	text-align: center;
 	position: relative;
 
@@ -6,7 +9,15 @@
 	box-shadow: 0px 0px 15px 2px black;
 }
 
-.settings-panel input[type=number]{
+.settings-section{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.settings-section input[type=number]{
+	width: 40%;
+	height: 25px;
 	background-color: #141414;
 	color: white;
 	border: none;
@@ -16,14 +27,15 @@
 	font-style: normal;
 	font-size: 100%;
 
-	width: 40%;
-	height: 25px;
+	appearance: textfield;
 	-moz-appearance: textfield;
 }
 
-.settings-panel p{
+.settings-section p{
+	max-width: 50%;
+	
+	text-align: left;
 	display: inline-block;
-	margin-right: 7%;
 }
 
 .settings-panel button{

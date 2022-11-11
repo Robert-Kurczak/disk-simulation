@@ -1,3 +1,4 @@
+//TODO change to class
 interface vector2{
 	x: number,
 	y: number
@@ -29,7 +30,9 @@ class SimulationCanvas{
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
 
 	private deltaT = 0.004;
-	private gConstant = 0.0000000000667;
+
+	//---Gravity properties---
+	private gConstant = 6.67e-11;
 
 	private bigMass = {
 		position: {
@@ -39,6 +42,13 @@ class SimulationCanvas{
 
 		mass: 2e18
 	}
+
+	private useGravity: boolean = false;
+	//------
+
+	//---Drag properties---
+	private useDrag: boolean = false;
+	//------
 
 	constructor(width: number, height: number, wrapperID: string, canvasClass: string){
 		this.width = width;
@@ -63,6 +73,20 @@ class SimulationCanvas{
 		this.bigMass.position.x = this.width / 2;
 		this.bigMass.position.y = this.height / 2;
 	}
+
+	//---Setters---
+	public setGconstant(value: number){this.gConstant = value}
+	public setBigMass(value: number){this.bigMass.mass = value}
+	public setUseGravity(value: boolean){this.useGravity = value}
+	public setUseDrag(value: boolean){this.useDrag = value}
+	//------
+
+	//---Getters---
+	public getGconstant(){return this.gConstant}
+	public getBigMass(){return this.bigMass.mass}
+	public getUseGravity(){return this.useGravity}
+	public getUseDrag(){return this.useDrag}
+	//---
 
 	//---Private methods---
 	private generateDisks(diskAmount: number){
@@ -98,6 +122,33 @@ class SimulationCanvas{
 			this.canvasCTX.fill();
 		}
 	}
+
+	//-Calculations-
+	private getGravAcceleration(disk: Disk){
+		//distance vector between disk and big mass
+		let distanceVec: vector2 = {
+			x: this.bigMass.position.x - disk.position.x,
+			y: this.bigMass.position.y - disk.position.y
+		}
+
+		//value of distance vector
+		let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
+
+		//unit vector (versor) that show direction to big mass
+		let distanceVer: vector2 = {
+			x: distanceVec.x / distanceVal,
+			y: distanceVec.y / distanceVal
+		};
+
+		let acceleration: vector2 = {
+			x: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.x,
+			y: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.y
+		}
+
+		return acceleration;
+	}
+	//--
+
 	//------
 
 	//---Public methods---
@@ -119,24 +170,12 @@ class SimulationCanvas{
 
 			for(let disk of diskArray){
 
-				//distance vector between disk and big mass
-				let distanceVec: vector2 = {
-					x: this.bigMass.position.x - disk.position.x,
-					y: this.bigMass.position.y - disk.position.y
-				}
+				let acceleration: vector2 = {x: 0, y: 0};
 
-				//value of distance vector
-				let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
-
-				//unit vector (versor) that show direction to big mass
-				let distanceVer: vector2 = {
-					x: distanceVec.x / distanceVal,
-					y: distanceVec.y / distanceVal
-				};
-
-				let acceleration: vector2 = {
-					x: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.x,
-					y: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.y
+				if(this.useGravity){
+					const gravityAcceleration = this.getGravAcceleration(disk);
+					acceleration.x += gravityAcceleration.x;
+					acceleration.y += gravityAcceleration.y;
 				}
 
 				disk.velocity.x += acceleration.x * this.deltaT;

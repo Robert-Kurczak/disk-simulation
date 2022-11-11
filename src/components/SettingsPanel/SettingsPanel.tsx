@@ -1,18 +1,30 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import SimulationCanvas from "../MainCanvas/SimulationCanvas";
 
 import "../../styles/SettingsPanel.css";
+import GravitySettings from "./sections/GravitySettings";
 
 interface Props{
 	mainCanvas: SimulationCanvas
 }
 
 function SettingsPanel(props: Props){
-	let disksAmount: number = 1000;
-	let gConst: number = 6.67e-11;
-	let bigMassValue: number = 2.0e16;
-
 	const {mainCanvas} = props;
+
+	const [showGravitySettings, setShowGravitySettings] = useState(mainCanvas.getUseGravity());
+	const [showDragSettings, setShowDragSettings] = useState(mainCanvas.getUseDrag());
+
+	let disksAmount: number = 1000;
+
+	const toggleGravitySettings = () => {
+		mainCanvas.setUseGravity(!showGravitySettings);
+		setShowGravitySettings(!showGravitySettings);
+	}
+
+	const toggleDragSettings = () => {
+		mainCanvas.setUseDrag(!showDragSettings);
+		setShowDragSettings(!showDragSettings);
+	}
 
 	//---Updaters---
 	const updateAmount = (e:ChangeEvent<HTMLInputElement>) => {
@@ -21,14 +33,14 @@ function SettingsPanel(props: Props){
 		if(value >= 0) disksAmount = value;
 	};
 
-	const updateGconst = (e:ChangeEvent<HTMLInputElement>) => {
-		gConst = parseFloat(e.target.value);
+	const updateGconstant = (e:ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setGconstant(parseFloat(e.target.value));
 	};
 
 	const updateBigMass = (e:ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseFloat(e.target.value);
 
-		if(value > 0) bigMassValue = value;
+		if(value > 0) mainCanvas.setBigMass(value);
 	};
 	//------
 
@@ -41,18 +53,29 @@ function SettingsPanel(props: Props){
 			<h3>Settings</h3>
 			<div className="settings-section">
 				<p>Disks amount:</p>
-				<input type="number" defaultValue={disksAmount} min={0} onChange={updateAmount}/>
+				<input type="number" defaultValue={disksAmount} min={0} onInput={updateAmount}/>
 			</div>
 
 			<div className="settings-section">
-				<p>Gravitational constant [<sup>Nm<sup>2</sup></sup>&frasl;<sub>kg<sup>2</sup></sub>]:</p>
-				<input type="number" defaultValue={gConst} onChange={updateGconst}/>
+				<p>Use gravity: </p>
+				<input type="checkbox" defaultChecked={showGravitySettings} onClick={toggleGravitySettings}></input>
 			</div>
 
+			{showGravitySettings &&
+				<GravitySettings
+					defaultGconstant={mainCanvas.getGconstant()}
+					updateGconstantHandler={updateGconstant}
+
+					defaultBigMass={mainCanvas.getBigMass()}
+					updateBigMassHandler={updateBigMass}
+				/>
+			}
+
 			<div className="settings-section">
-				<p>Big Mass [kg]:</p>
-				<input type="number" defaultValue={bigMassValue} min={0} onChange={updateBigMass}/>
+				<p>Use drag: </p>
+				<input type="checkbox" defaultChecked={showDragSettings} onClick={toggleDragSettings}></input>
 			</div>
+
 
 			<button onClick={generate}>Generate</button>
 		</div>

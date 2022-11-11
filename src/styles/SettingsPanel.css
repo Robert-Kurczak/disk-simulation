@@ -15,7 +15,7 @@
 	justify-content: space-between;
 }
 
-.settings-section input[type=number]{
+.settings-section input{
 	width: 40%;
 	height: 25px;
 	background-color: #141414;

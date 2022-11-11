@@ -14,9 +14,11 @@ function App(){
 				setMainCanvas={setMainCanvas as React.Dispatch<React.SetStateAction<SimulationCanvas>>}
 			/>
 
-			<SettingsPanel
-				mainCanvas={mainCanvas as SimulationCanvas}
-			/>
+			{mainCanvas && 
+				<SettingsPanel
+					mainCanvas={mainCanvas as SimulationCanvas}
+				/>
+			}
 		</div>
 	);
 }

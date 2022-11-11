@@ -6,12 +6,14 @@ interface vector2{
 
 class Disk{
 	radius: number;
+	mass: number;
 	position: vector2;
 	velocity: vector2;
 	color: string;
 
-	constructor(radius: number, position: vector2, velocity: vector2, color: string){
+	constructor(radius: number, mass: number, position: vector2, velocity: vector2, color: string){
 		this.radius = radius;
+		this.mass = mass;
 		this.position = position;
 		this.velocity = velocity
 		this.color = color;
@@ -47,6 +49,8 @@ class SimulationCanvas{
 	//------
 
 	//---Drag properties---
+	private viscosity: number = 8.9e-2;
+
 	private useDrag: boolean = false;
 	//------
 
@@ -78,6 +82,7 @@ class SimulationCanvas{
 	public setGconstant(value: number){this.gConstant = value}
 	public setBigMass(value: number){this.bigMass.mass = value}
 	public setUseGravity(value: boolean){this.useGravity = value}
+	public setViscosity(value: number){this.viscosity = value}
 	public setUseDrag(value: boolean){this.useDrag = value}
 	//------
 
@@ -85,6 +90,7 @@ class SimulationCanvas{
 	public getGconstant(){return this.gConstant}
 	public getBigMass(){return this.bigMass.mass}
 	public getUseGravity(){return this.useGravity}
+	public getViscosity(){return this.viscosity}
 	public getUseDrag(){return this.useDrag}
 	//---
 
@@ -94,19 +100,22 @@ class SimulationCanvas{
 
 		for(let i = 0; i < diskAmount; i++){
 			const randRadius: number = Math.random() * this.width / 100;
+
+			const randMass: number = (Math.random() * 19 + 1);
+
 			const randPosition: vector2 = {
 				x: Math.random() * (this.width -2 * randRadius) + randRadius,
 				y: Math.random() * (this.height -2 * randRadius) + randRadius
 			}
 
 			const randVelocity: vector2 = {
-				x: Math.random() * 200 - 100,
-				y: Math.random() * 200 - 100
+				x: Math.random() * 400 - 200,
+				y: Math.random() * 400 - 200
 			}
 
 			const color: string = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
 
-			diskArray.push(new Disk(randRadius, randPosition, randVelocity, color));
+			diskArray.push(new Disk(randRadius, randMass, randPosition, randVelocity, color));
 		}
 
 		return diskArray;
@@ -147,6 +156,17 @@ class SimulationCanvas{
 
 		return acceleration;
 	}
+
+	private getDragAcceleration(disk: Disk){
+		let a: number = (-6 * Math.PI * this.viscosity * disk.radius) / disk.mass;
+
+		let acceleration: vector2 = {
+			x: a * disk.velocity.x,
+			y: a * disk.velocity.y
+		}
+
+		return acceleration;
+	}
 	//--
 
 	//------
@@ -176,6 +196,13 @@ class SimulationCanvas{
 					const gravityAcceleration = this.getGravAcceleration(disk);
 					acceleration.x += gravityAcceleration.x;
 					acceleration.y += gravityAcceleration.y;
+				}
+
+				if(this.useDrag){
+					const dragAcceleration = this.getDragAcceleration(disk);
+
+					acceleration.x += dragAcceleration.x;
+					acceleration.y += dragAcceleration.y;
 				}
 
 				disk.velocity.x += acceleration.x * this.deltaT;

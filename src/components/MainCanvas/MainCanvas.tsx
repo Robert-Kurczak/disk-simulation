@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import SimulationCanvas from "./SimulationCanvas";
+import SimulationCanvas from "./Simulation/SimulationCanvas";
 
 import "../../styles/MainCanvas.css";
 

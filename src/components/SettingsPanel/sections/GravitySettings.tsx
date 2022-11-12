@@ -25,7 +25,7 @@ function GravitySettings(props: Props){
 					type="number"
 					defaultValue={defaultGconstant}
 					step={1e-13}
-					onInput={updateGconstantHandler}
+					onChange={updateGconstantHandler}
 				/>
 			</div>
 
@@ -36,7 +36,16 @@ function GravitySettings(props: Props){
 					defaultValue={defaultBigMass}
 					step={1e+18}
 					min={0}
-					onInput={updateBigMassHandler}
+					onChange={updateBigMassHandler}
+				/>
+			</div>
+
+			<div className="settings-section">
+				<p>Destructable disks:</p>
+				<input
+					type="checkbox"
+					defaultValue={defaultBigMass}
+					defaultChecked={true}
 				/>
 			</div>
 		</React.Fragment>

@@ -1,24 +1,6 @@
-//TODO change to class
-interface vector2{
-	x: number,
-	y: number
-}
-
-class Disk{
-	radius: number;
-	mass: number;
-	position: vector2;
-	velocity: vector2;
-	color: string;
-
-	constructor(radius: number, mass: number, position: vector2, velocity: vector2, color: string){
-		this.radius = radius;
-		this.mass = mass;
-		this.position = position;
-		this.velocity = velocity
-		this.color = color;
-	}
-}
+import Disk from "./Disk";
+import { DragField, GravityField } from "./Fields";
+import { Vector2 } from "./Vector";
 
 class SimulationCanvas{
 	private width: number;
@@ -32,24 +14,16 @@ class SimulationCanvas{
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
 
 	private deltaT = 0.004;
+	private destructableDisks = true;
 
 	//---Gravity properties---
-	private gConstant = 6.67e-11;
-
-	private bigMass = {
-		position: {
-			x: 0,
-			y: 0
-		},
-
-		mass: 2e18
-	}
+	private gravityFields: Array<GravityField> = [];
 
 	private useGravity: boolean = false;
 	//------
 
 	//---Drag properties---
-	private viscosity: number = 8.9e-2;
+	private dragFields: Array<DragField> = [];
 
 	private useDrag: boolean = false;
 	//------
@@ -74,23 +48,40 @@ class SimulationCanvas{
 		this.canvasWrapper.appendChild(this.canvasNode);
 		//------
 
-		this.bigMass.position.x = this.width / 2;
-		this.bigMass.position.y = this.height / 2;
+		this.gravityFields.push(
+			new GravityField(
+				6.67e-11,
+				new Vector2(this.width / 2, this.height / 2),
+				2e18
+			)
+		);
+
+		this.dragFields.push(
+			new DragField(
+				8.9e-2,
+				1e-4,
+				new Vector2(this.width / 2, this.height / 2)
+			)
+		);
 	}
 
 	//---Setters---
-	public setGconstant(value: number){this.gConstant = value}
-	public setBigMass(value: number){this.bigMass.mass = value}
+	public setGconstant(value: number){this.gravityFields[0].gConstant = value}
+	public setBigMass(value: number){this.gravityFields[0].mass = value}
 	public setUseGravity(value: boolean){this.useGravity = value}
-	public setViscosity(value: number){this.viscosity = value}
+
+	public setViscosity(value: number){this.dragFields[0].viscosity = value}
+	public setViscositySlope(value: number){this.dragFields[0].viscositySlope = value}
 	public setUseDrag(value: boolean){this.useDrag = value}
 	//------
 
 	//---Getters---
-	public getGconstant(){return this.gConstant}
-	public getBigMass(){return this.bigMass.mass}
+	public getGconstant(){return this.gravityFields[0].gConstant}
+	public getBigMass(){return this.gravityFields[0].mass}
 	public getUseGravity(){return this.useGravity}
-	public getViscosity(){return this.viscosity}
+
+	public getViscosity(){return this.dragFields[0].viscosity}
+	public getViscositySlope(){return this.dragFields[0].viscositySlope}
 	public getUseDrag(){return this.useDrag}
 	//---
 
@@ -103,15 +94,15 @@ class SimulationCanvas{
 
 			const randMass: number = (Math.random() * 19 + 1);
 
-			const randPosition: vector2 = {
-				x: Math.random() * (this.width -2 * randRadius) + randRadius,
-				y: Math.random() * (this.height -2 * randRadius) + randRadius
-			}
+			const randPosition: Vector2 = new Vector2(
+				Math.random() * (this.width -2 * randRadius) + randRadius,
+				Math.random() * (this.height -2 * randRadius) + randRadius
+			);
 
-			const randVelocity: vector2 = {
-				x: Math.random() * 400 - 200,
-				y: Math.random() * 400 - 200
-			}
+			const randVelocity: Vector2 = new Vector2(
+				Math.random() * 400 - 200,
+				Math.random() * 400 - 200
+			);
 
 			const color: string = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
 
@@ -131,44 +122,6 @@ class SimulationCanvas{
 			this.canvasCTX.fill();
 		}
 	}
-
-	//-Calculations-
-	private getGravAcceleration(disk: Disk){
-		//distance vector between disk and big mass
-		let distanceVec: vector2 = {
-			x: this.bigMass.position.x - disk.position.x,
-			y: this.bigMass.position.y - disk.position.y
-		}
-
-		//value of distance vector
-		let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
-
-		//unit vector (versor) that show direction to big mass
-		let distanceVer: vector2 = {
-			x: distanceVec.x / distanceVal,
-			y: distanceVec.y / distanceVal
-		};
-
-		let acceleration: vector2 = {
-			x: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.x,
-			y: ((this.gConstant * this.bigMass.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.y
-		}
-
-		return acceleration;
-	}
-
-	private getDragAcceleration(disk: Disk){
-		let a: number = (-6 * Math.PI * this.viscosity * disk.radius) / disk.mass;
-
-		let acceleration: vector2 = {
-			x: a * disk.velocity.x,
-			y: a * disk.velocity.y
-		}
-
-		return acceleration;
-	}
-	//--
-
 	//------
 
 	//---Public methods---
@@ -184,22 +137,38 @@ class SimulationCanvas{
 			this.drawDisks(diskArray);
 
 			this.canvasCTX.beginPath();
-			this.canvasCTX.arc(this.bigMass.position.x, this.bigMass.position.y, 5, 0, 2 * Math.PI);
+			this.canvasCTX.arc(
+				this.gravityFields[0].fieldCenter.x,
+				this.gravityFields[0].fieldCenter.y,
+				5,
+				0,
+				2 * Math.PI
+			);
 			this.canvasCTX.fillStyle = "#ff0044";
 			this.canvasCTX.fill();
 
-			for(let disk of diskArray){
+			for(let i = diskArray.length - 1; i >= 0; i--){
+				const disk = diskArray[i];
 
-				let acceleration: vector2 = {x: 0, y: 0};
+				//Removing disk that are too close to big mass
+				if(this.destructableDisks && this.useGravity){
+					if(this.gravityFields[0].getDistance(disk.position) <= 15){
+						console.log(diskArray.length)
+						diskArray.splice(i, 1);
+						continue;
+					}
+				}
+
+				let acceleration: Vector2 = new Vector2(0, 0);
 
 				if(this.useGravity){
-					const gravityAcceleration = this.getGravAcceleration(disk);
+					const gravityAcceleration = this.gravityFields[0].getAcceleration(disk);
 					acceleration.x += gravityAcceleration.x;
 					acceleration.y += gravityAcceleration.y;
 				}
 
 				if(this.useDrag){
-					const dragAcceleration = this.getDragAcceleration(disk);
+					const dragAcceleration = this.dragFields[0].getAcceleration(disk);
 
 					acceleration.x += dragAcceleration.x;
 					acceleration.y += dragAcceleration.y;
@@ -208,14 +177,14 @@ class SimulationCanvas{
 				disk.velocity.x += acceleration.x * this.deltaT;
 				disk.velocity.y += acceleration.y * this.deltaT;
 
-				const potentialPosition: vector2 = {
-					x: disk.position.x += disk.velocity.x * this.deltaT,
-					y: disk.position.y += disk.velocity.y * this.deltaT
-				}
+				const potentialPosition: Vector2 = new Vector2(
+					disk.position.x += disk.velocity.x * this.deltaT,
+					disk.position.y += disk.velocity.y * this.deltaT
+				)
 
 				//---Border collisions---
 				//x
-				if(potentialPosition.x + disk.radius > this.width){
+				if(potentialPosition.x + disk.radius >= this.width){
 					potentialPosition.x  = this.width - disk.radius;
 
 					disk.velocity.x *= -1;
@@ -227,20 +196,28 @@ class SimulationCanvas{
 				}
 
 				//y
-				if(potentialPosition.y + disk.radius > this.height){
+				if(potentialPosition.y + disk.radius >= this.height){
 					potentialPosition.y  = this.height - disk.radius
 
 					disk.velocity.y *= -1;
 				}
-				else if(potentialPosition.y - disk.radius < 0){
+				else if(potentialPosition.y - disk.radius <= 0){
 					potentialPosition.y = disk.radius;
 
 					disk.velocity.y *= -1;
 				}
 				//------
-
-				disk.position = potentialPosition;
 			}
+
+			//Cleaning from dead particles
+			if(this.destructableDisks && this.useGravity){
+				for(let i = 0; i < diskArray.length; i++){
+					if(diskArray[i].toDestroy){
+						diskArray.splice(i, 1);
+					}
+				}
+			}
+
 		}, this.deltaT * 1000);
 	}
 	//------

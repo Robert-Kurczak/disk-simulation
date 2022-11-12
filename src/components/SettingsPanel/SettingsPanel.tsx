@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import SimulationCanvas from "../MainCanvas/SimulationCanvas";
+import SimulationCanvas from "../MainCanvas/Simulation/SimulationCanvas";
 
 import "../../styles/SettingsPanel.css";
 import GravitySettings from "./sections/GravitySettings";

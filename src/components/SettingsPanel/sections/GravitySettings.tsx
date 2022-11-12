@@ -6,6 +6,9 @@ interface Props{
 
 	defaultBigMass: number;
 	updateBigMassHandler: React.FormEventHandler<HTMLInputElement>;
+
+	defaultDestDisks: boolean,
+	updateDestDisksHandler: React.FormEventHandler<HTMLInputElement>;
 }
 
 function GravitySettings(props: Props){
@@ -14,7 +17,10 @@ function GravitySettings(props: Props){
 		updateGconstantHandler,
 
 		defaultBigMass,
-		updateBigMassHandler
+		updateBigMassHandler,
+
+		defaultDestDisks,
+		updateDestDisksHandler
 	}= props;
 
 	return(
@@ -44,8 +50,8 @@ function GravitySettings(props: Props){
 				<p>Destructable disks:</p>
 				<input
 					type="checkbox"
-					defaultValue={defaultBigMass}
-					defaultChecked={true}
+					defaultChecked={defaultDestDisks}
+					onClick={updateDestDisksHandler}
 				/>
 			</div>
 		</React.Fragment>

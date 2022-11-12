@@ -60,6 +60,9 @@ export class DragField{
 	public getAcceleration(disk: Disk){
 		let a: number = (-6 * Math.PI * this.viscosityFromPosition(disk.position) * disk.radius) / disk.mass;
 
+		//Acceleration by drag have to be negative
+		if(a > 0) return new Vector2(0, 0);
+
 		let acceleration: Vector2 = new Vector2(
 			a * disk.velocity.x,
 			a * disk.velocity.y

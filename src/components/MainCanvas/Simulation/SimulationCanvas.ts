@@ -66,6 +66,7 @@ class SimulationCanvas{
 	}
 
 	//---Setters---
+	public setDestructableDisks(value: boolean){this.destructableDisks = value}
 	public setGconstant(value: number){this.gravityFields[0].gConstant = value}
 	public setBigMass(value: number){this.gravityFields[0].mass = value}
 	public setUseGravity(value: boolean){this.useGravity = value}
@@ -76,10 +77,11 @@ class SimulationCanvas{
 	//------
 
 	//---Getters---
+	public getDestructableDisks(){return this.destructableDisks}
 	public getGconstant(){return this.gravityFields[0].gConstant}
 	public getBigMass(){return this.gravityFields[0].mass}
 	public getUseGravity(){return this.useGravity}
-
+	
 	public getViscosity(){return this.dragFields[0].viscosity}
 	public getViscositySlope(){return this.dragFields[0].viscositySlope}
 	public getUseDrag(){return this.useDrag}
@@ -152,8 +154,8 @@ class SimulationCanvas{
 
 				//Removing disk that are too close to big mass
 				if(this.destructableDisks && this.useGravity){
+					console.log("dest")
 					if(this.gravityFields[0].getDistance(disk.position) <= 15){
-						console.log(diskArray.length)
 						diskArray.splice(i, 1);
 						continue;
 					}

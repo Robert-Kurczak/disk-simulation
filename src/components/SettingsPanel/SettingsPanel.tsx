@@ -3,6 +3,7 @@ import SimulationCanvas from "../MainCanvas/Simulation/SimulationCanvas";
 
 import "../../styles/SettingsPanel.css";
 import GravitySettings from "./sections/GravitySettings";
+import DragSettings from "./sections/DragSettings";
 
 interface Props{
 	mainCanvas: SimulationCanvas
@@ -27,21 +28,37 @@ function SettingsPanel(props: Props){
 	}
 
 	//---Updaters---
-	const updateAmount = (e:ChangeEvent<HTMLInputElement>) => {
+	const updateAmount = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseInt(e.target.value);
 
 		if(value >= 0) disksAmount = value;
 	};
 
-	const updateGconstant = (e:ChangeEvent<HTMLInputElement>) => {
+	//-Gravity-
+	const updateGconstant = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setGconstant(parseFloat(e.target.value));
 	};
 
-	const updateBigMass = (e:ChangeEvent<HTMLInputElement>) => {
+	const updateBigMass = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseFloat(e.target.value);
 
 		if(value > 0) mainCanvas.setBigMass(value);
 	};
+
+	const updateDestDisks = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setDestructableDisks(e.target.checked);
+	};
+	//--
+
+	//-Drag-
+	const updateViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setViscosity(parseFloat(e.target.value));
+	}
+
+	const updateViscSlopeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setViscositySlope(parseFloat(e.target.value));
+	}
+	//--
 	//------
 
 	const generate = () => {
@@ -68,13 +85,28 @@ function SettingsPanel(props: Props){
 
 					defaultBigMass={mainCanvas.getBigMass()}
 					updateBigMassHandler={updateBigMass}
+
+					defaultDestDisks={mainCanvas.getDestructableDisks()}
+					updateDestDisksHandler={updateDestDisks}
 				/>
 			}
+
+			<div className="section-divider"></div>
 
 			<div className="settings-section">
 				<p>Use drag: </p>
 				<input type="checkbox" defaultChecked={showDragSettings} onClick={toggleDragSettings}></input>
 			</div>
+
+			{showDragSettings &&
+				<DragSettings
+					defaultViscosity={mainCanvas.getViscosity()}
+					updateViscHandler={updateViscHandler}
+
+					defaultViscositySlope={mainCanvas.getViscositySlope()}
+					updateViscSlopeHandler={updateViscSlopeHandler}
+				/>
+			}
 
 
 			<button onClick={generate}>Generate</button>

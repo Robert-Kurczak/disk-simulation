@@ -11,6 +11,9 @@ class SimulationCanvas{
 	private canvasNode: HTMLCanvasElement;
 	private canvasCTX: CanvasRenderingContext2D;
 
+	private fieldCanvasNode: HTMLCanvasElement;
+	private fieldCanvasCTX: CanvasRenderingContext2D;
+
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
 
 	private deltaT = 0.004;
@@ -20,6 +23,7 @@ class SimulationCanvas{
 	private gravityFields: Array<GravityField> = [];
 
 	private useGravity: boolean = false;
+	private visualizeGravity: boolean = false;
 	//------
 
 	//---Drag properties---
@@ -35,17 +39,34 @@ class SimulationCanvas{
 		//---Setting wrapper---
 		this.canvasWrapper = document.getElementById(wrapperID) as HTMLDivElement;
 		this.canvasWrapper.innerHTML = "";
+
+		this.canvasWrapper.style.width = `${this.width}px`;
+		this.canvasWrapper.style.height = `${this.height}px`;
+		this.canvasWrapper.style.position = "relative";
 		//------
 
 		//---Constructing canvas---
 		this.canvasNode = document.createElement("canvas") as HTMLCanvasElement;
 		this.canvasNode.width = width;
 		this.canvasNode.height = height;
+
+		this.canvasNode.style.position = "absolute";
+
+		//For custom, user styling
 		this.canvasNode.setAttribute("class", canvasClass);
 
 		this.canvasCTX = this.canvasNode.getContext("2d") as CanvasRenderingContext2D;
 		
 		this.canvasWrapper.appendChild(this.canvasNode);
+		//------
+
+		//---Constructing field canvas---
+		this.fieldCanvasNode = this.canvasNode.cloneNode() as HTMLCanvasElement;
+		this.fieldCanvasCTX = this.fieldCanvasNode.getContext("2d") as CanvasRenderingContext2D;
+		
+		this.canvasWrapper.appendChild(this.fieldCanvasNode);
+
+		this.canvasWrapper.insertBefore(this.fieldCanvasNode, this.canvasNode);
 		//------
 
 		this.gravityFields.push(
@@ -70,6 +91,7 @@ class SimulationCanvas{
 	public setGconstant(value: number){this.gravityFields[0].gConstant = value}
 	public setBigMass(value: number){this.gravityFields[0].mass = value}
 	public setUseGravity(value: boolean){this.useGravity = value}
+	public setVisualizeGravity(value: boolean){this.visualizeGravity = value}
 
 	public setViscosity(value: number){this.dragFields[0].viscosity = value}
 	public setViscositySlope(value: number){this.dragFields[0].viscositySlope = value}
@@ -81,6 +103,7 @@ class SimulationCanvas{
 	public getGconstant(){return this.gravityFields[0].gConstant}
 	public getBigMass(){return this.gravityFields[0].mass}
 	public getUseGravity(){return this.useGravity}
+	public getVisualizeGravity(){return this.visualizeGravity}
 	
 	public getViscosity(){return this.dragFields[0].viscosity}
 	public getViscositySlope(){return this.dragFields[0].viscositySlope}
@@ -123,6 +146,38 @@ class SimulationCanvas{
 			this.canvasCTX.fillStyle = currentDisk.color;
 			this.canvasCTX.fill();
 		}
+	}
+
+	public printGravityFieldImg(){
+		const fieldImg: ImageData = this.fieldCanvasCTX.createImageData(this.width, this.height);
+
+		for(let field of this.gravityFields){
+			for(let y = 0; y < this.height; y++){
+				for(let x = 0 ; x < this.width; x++){
+					const potential: number = field.gConstant * field.mass / (field.getDistance(new Vector2(x, y)) + 0.01);
+
+					//TODO scale based on max radius
+					const scaledPotential = potential / 3000;
+
+					const index: number = (y * this.width + x) * 4;
+
+					//R
+					fieldImg.data[index + 0] = scaledPotential;
+					//G
+					fieldImg.data[index + 1] = 0;
+					//B
+					fieldImg.data[index + 2] = 0;
+					//A
+					fieldImg.data[index + 3] = scaledPotential;
+				}
+			}
+		}
+
+		this.fieldCanvasCTX.putImageData(fieldImg, 0, 0);
+	}
+
+	public clearGravityFieldImg(){
+		this.fieldCanvasCTX.clearRect(0, 0, this.width, this.height);
 	}
 	//------
 
@@ -222,6 +277,17 @@ class SimulationCanvas{
 
 		}, this.deltaT * 1000);
 	}
+
+	// public toggleGravityField(){
+	// 	if(this.visualizeGravity){
+	// 		this.fieldCanvasCTX.clearRect(0, 0, this.width, this.height);
+	// 	}
+	// 	else{
+	// 		this.printGravityFieldImg();
+	// 	}
+
+	// 	this.visualizeGravity = !this.visualizeGravity;
+	// }
 	//------
 
 

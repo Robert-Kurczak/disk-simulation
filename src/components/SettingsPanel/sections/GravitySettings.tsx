@@ -9,6 +9,9 @@ interface Props{
 
 	defaultDestDisks: boolean,
 	updateDestDisksHandler: React.FormEventHandler<HTMLInputElement>;
+
+	defaultVisualizeGravity: boolean,
+	updateVisualizeGravityHandler: React.FormEventHandler<HTMLInputElement>
 }
 
 function GravitySettings(props: Props){
@@ -20,7 +23,10 @@ function GravitySettings(props: Props){
 		updateBigMassHandler,
 
 		defaultDestDisks,
-		updateDestDisksHandler
+		updateDestDisksHandler,
+
+		defaultVisualizeGravity,
+		updateVisualizeGravityHandler
 	}= props;
 
 	return(
@@ -52,6 +58,15 @@ function GravitySettings(props: Props){
 					type="checkbox"
 					defaultChecked={defaultDestDisks}
 					onClick={updateDestDisksHandler}
+				/>
+			</div>
+
+			<div className="settings-section">
+				<p>Visualize field:</p>
+				<input
+					type="checkbox"
+					defaultChecked={defaultVisualizeGravity}
+					onClick={updateVisualizeGravityHandler}
 				/>
 			</div>
 		</React.Fragment>

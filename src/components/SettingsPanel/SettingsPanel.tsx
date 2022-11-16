@@ -15,7 +15,7 @@ function SettingsPanel(props: Props){
 	const [showGravitySettings, setShowGravitySettings] = useState(mainCanvas.getUseGravity());
 	const [showDragSettings, setShowDragSettings] = useState(mainCanvas.getUseDrag());
 
-	let disksAmount: number = 1000;
+	let disksAmount: number = 200;
 
 	const toggleGravitySettings = () => {
 		mainCanvas.setUseGravity(!showGravitySettings);
@@ -37,17 +37,33 @@ function SettingsPanel(props: Props){
 	//-Gravity-
 	const updateGconstant = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setGconstant(parseFloat(e.target.value));
+
+		if(mainCanvas.getVisualizeGravity()){mainCanvas.printGravityFieldImg()}
 	};
 
 	const updateBigMass = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseFloat(e.target.value);
 
 		if(value > 0) mainCanvas.setBigMass(value);
+		if(mainCanvas.getVisualizeGravity()){mainCanvas.printGravityFieldImg()}
 	};
 
 	const updateDestDisks = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setDestructableDisks(e.target.checked);
 	};
+
+	const updateVisualizeGravityHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		const value: boolean = e.target.checked;
+
+		mainCanvas.setVisualizeGravity(value);
+
+		if(value){
+			mainCanvas.printGravityFieldImg();
+		}
+		else{
+			mainCanvas.clearGravityFieldImg();
+		}
+	}
 	//--
 
 	//-Drag-
@@ -88,6 +104,9 @@ function SettingsPanel(props: Props){
 
 					defaultDestDisks={mainCanvas.getDestructableDisks()}
 					updateDestDisksHandler={updateDestDisks}
+
+					defaultVisualizeGravity={mainCanvas.getVisualizeGravity()}
+					updateVisualizeGravityHandler={updateVisualizeGravityHandler}
 				/>
 			}
 

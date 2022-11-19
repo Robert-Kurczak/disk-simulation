@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useRef } from "react";
 import SimulationCanvas from "../MainCanvas/Simulation/SimulationCanvas";
 
 import "../../styles/SettingsPanel.css";
@@ -13,7 +13,10 @@ function SettingsPanel(props: Props){
 	const {mainCanvas} = props;
 
 	const [showGravitySettings, setShowGravitySettings] = useState(mainCanvas.getUseGravity());
+	let visualizeGravity = useRef(false);
+
 	const [showDragSettings, setShowDragSettings] = useState(mainCanvas.getUseDrag());
+	let visualizeDrag = useRef(false);
 
 	let disksAmount: number = 200;
 
@@ -38,14 +41,14 @@ function SettingsPanel(props: Props){
 	const updateGconstant = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setGconstant(parseFloat(e.target.value));
 
-		if(mainCanvas.getVisualizeGravity()){mainCanvas.printGravityFieldImg()}
+		if(visualizeGravity.current){mainCanvas.printGravityFieldImg()}
 	};
 
 	const updateBigMass = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseFloat(e.target.value);
 
 		if(value > 0) mainCanvas.setBigMass(value);
-		if(mainCanvas.getVisualizeGravity()){mainCanvas.printGravityFieldImg()}
+		if(visualizeGravity.current){mainCanvas.printGravityFieldImg()}
 	};
 
 	const updateDestDisks = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +58,7 @@ function SettingsPanel(props: Props){
 	const updateVisualizeGravityHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: boolean = e.target.checked;
 
-		mainCanvas.setVisualizeGravity(value);
+		visualizeGravity.current = value;
 
 		if(value){
 			mainCanvas.printGravityFieldImg();
@@ -70,31 +73,31 @@ function SettingsPanel(props: Props){
 	const updateNormalViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setNormalViscosity(parseFloat(e.target.value));
 
-		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+		if(visualizeDrag.current){mainCanvas.printDragFieldImg()}
 	}
 
 	const updateMaxViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setMaxViscosity(parseFloat(e.target.value));
 
-		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+		if(visualizeDrag.current){mainCanvas.printDragFieldImg()}
 	}
 
 	const updateViscSlopeHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setViscositySlope(parseFloat(e.target.value));
 
-		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+		if(visualizeDrag.current){mainCanvas.printDragFieldImg()}
 	}
 	
 	const updateHighVpositionXHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setHighVpositionX(parseFloat(e.target.value));
 
-		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+		if(visualizeDrag.current){mainCanvas.printDragFieldImg()}
 	}
 	
 	const updateVisualizeDragHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: boolean = e.target.checked;
 
-		mainCanvas.setVisualizeDrag(value);
+		visualizeDrag.current = value;
 
 		if(value){
 			mainCanvas.printDragFieldImg();
@@ -134,7 +137,7 @@ function SettingsPanel(props: Props){
 					defaultDestDisks={mainCanvas.getDestructableDisks()}
 					updateDestDisksHandler={updateDestDisks}
 
-					defaultVisualizeGravity={mainCanvas.getVisualizeGravity()}
+					defaultVisualizeGravity={visualizeGravity.current}
 					updateVisualizeGravityHandler={updateVisualizeGravityHandler}
 				/>
 			}
@@ -162,7 +165,7 @@ function SettingsPanel(props: Props){
 					defaultHighVpositionX={mainCanvas.getHighVpositionX()}
 					updateHighVpositionXHandler={updateHighVpositionXHandler}
 
-					defaultVisualizeDrag={mainCanvas.getVisualizeDrag()}
+					defaultVisualizeDrag={visualizeDrag.current}
 					updateVisualizeDragHandler={updateVisualizeDragHandler}
 				/>
 			}

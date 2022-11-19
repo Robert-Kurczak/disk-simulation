@@ -26,14 +26,12 @@ class SimulationCanvas{
 	private gravityFields: Array<GravityField> = [];
 
 	private useGravity: boolean = false;
-	private visualizeGravity: boolean = false;
 	//------
 
 	//---Drag properties---
 	private dragFields: Array<DragField> = [];
 
 	private useDrag: boolean = false;
-	private visualizeDrag: boolean = false;
 	//------
 
 	constructor(width: number, height: number, wrapperID: string, canvasClass: string){
@@ -101,14 +99,12 @@ class SimulationCanvas{
 	public setGconstant(value: number){this.gravityFields[0].gConstant = value}
 	public setBigMass(value: number){this.gravityFields[0].mass = value}
 	public setUseGravity(value: boolean){this.useGravity = value}
-	public setVisualizeGravity(value: boolean){this.visualizeGravity = value}
 
 	public setNormalViscosity(value: number){this.dragFields[0].normalViscosity = value}
 	public setMaxViscosity(value: number){this.dragFields[0].maxViscosity = value}
 	public setViscositySlope(value: number){this.dragFields[0].viscositySlope = value}
 	public setHighVpositionX(value: number){this.dragFields[0].highVpositionX = value}
 	public setUseDrag(value: boolean){this.useDrag = value}
-	public setVisualizeDrag(value: boolean){this.visualizeDrag = value}
 	//------
 
 	//---Getters---
@@ -119,14 +115,12 @@ class SimulationCanvas{
 	public getGconstant(){return this.gravityFields[0].gConstant}
 	public getBigMass(){return this.gravityFields[0].mass}
 	public getUseGravity(){return this.useGravity}
-	public getVisualizeGravity(){return this.visualizeGravity}
 	
 	public getNormalViscosity(){return this.dragFields[0].normalViscosity}
 	public getMaxViscosity(){return this.dragFields[0].maxViscosity}
 	public getViscositySlope(){return this.dragFields[0].viscositySlope}
 	public getHighVpositionX(){return this.dragFields[0].highVpositionX}
 	public getUseDrag(){return this.useDrag}
-	public getVisualizeDrag(){return this.visualizeDrag}
 	//---
 
 	//---Private methods---

@@ -22,7 +22,7 @@ export class GravityField{
 			this.fieldCenter.x - disk.position.x,
 			this.fieldCenter.y - disk.position.y
 		);
-
+		
 		//value of distance vector
 		let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
 
@@ -33,8 +33,8 @@ export class GravityField{
 		);
 
 		let acceleration: Vector2 = new Vector2(
-			((this.gConstant * this.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.x,
-			((this.gConstant * this.mass) / (distanceVal**2 + 0.01)**1.5) * distanceVer.y
+			(this.gConstant * this.mass) / (distanceVal**2 + 0.01) * distanceVer.x,
+			(this.gConstant * this.mass) / (distanceVal**2 + 0.01) * distanceVer.y
 		);
 
 		return acceleration;
@@ -42,19 +42,21 @@ export class GravityField{
 }
 
 export class DragField{
-	public viscosity: number;
+	public normalViscosity: number;
+	public maxViscosity: number;
 	public viscositySlope: number;
-	public fieldCenter: Vector2;
+	public highVpositionX: number;
 
-	constructor(viscosity: number, viscositySlope: number, fieldCenter: Vector2){
-		this.viscosity = viscosity;
+	constructor(normalViscosity: number, maxViscosity: number, viscositySlope: number, highVpositionX: number){
+		this.normalViscosity = normalViscosity;
+		this.maxViscosity = maxViscosity;
 		this.viscositySlope = viscositySlope;
-		this.fieldCenter = fieldCenter;
+		this.highVpositionX = highVpositionX;
 	}
 
-	private viscosityFromPosition(position: Vector2){
-		let r: number = ((this.fieldCenter.x - position.x)**2 + (this.fieldCenter.y - position.y)**2)**0.5;
-		return this.viscosity + this.viscositySlope * r;
+	public viscosityFromPosition(position: Vector2){
+		const quadricResult: number = -this.viscositySlope * (position.x - this.highVpositionX)**2 + this.maxViscosity;
+		return Math.max(this.normalViscosity, quadricResult);
 	}
 
 	public getAcceleration(disk: Disk){

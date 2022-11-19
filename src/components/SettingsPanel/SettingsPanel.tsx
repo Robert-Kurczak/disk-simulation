@@ -67,12 +67,41 @@ function SettingsPanel(props: Props){
 	//--
 
 	//-Drag-
-	const updateViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
-		mainCanvas.setViscosity(parseFloat(e.target.value));
+	const updateNormalViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setNormalViscosity(parseFloat(e.target.value));
+
+		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+	}
+
+	const updateMaxViscHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setMaxViscosity(parseFloat(e.target.value));
+
+		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
 	}
 
 	const updateViscSlopeHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		mainCanvas.setViscositySlope(parseFloat(e.target.value));
+
+		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+	}
+	
+	const updateHighVpositionXHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		mainCanvas.setHighVpositionX(parseFloat(e.target.value));
+
+		if(mainCanvas.getVisualizeDrag()){mainCanvas.printDragFieldImg()}
+	}
+	
+	const updateVisualizeDragHandler = (e: ChangeEvent<HTMLInputElement>) => {
+		const value: boolean = e.target.checked;
+
+		mainCanvas.setVisualizeDrag(value);
+
+		if(value){
+			mainCanvas.printDragFieldImg();
+		}
+		else{
+			mainCanvas.clearDragFieldImg();
+		}
 	}
 	//--
 	//------
@@ -119,11 +148,22 @@ function SettingsPanel(props: Props){
 
 			{showDragSettings &&
 				<DragSettings
-					defaultViscosity={mainCanvas.getViscosity()}
-					updateViscHandler={updateViscHandler}
+					canvasWidth={mainCanvas.getWidth()}
+
+					defaultNormalViscosity={mainCanvas.getNormalViscosity()}
+					updateNormalViscHandler={updateNormalViscHandler}
+
+					defaultMaxViscosity={mainCanvas.getMaxViscosity()}
+					updateMaxViscHandler={updateMaxViscHandler}
 
 					defaultViscositySlope={mainCanvas.getViscositySlope()}
 					updateViscSlopeHandler={updateViscSlopeHandler}
+
+					defaultHighVpositionX={mainCanvas.getHighVpositionX()}
+					updateHighVpositionXHandler={updateHighVpositionXHandler}
+
+					defaultVisualizeDrag={mainCanvas.getVisualizeDrag()}
+					updateVisualizeDragHandler={updateVisualizeDragHandler}
 				/>
 			}
 

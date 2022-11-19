@@ -35,7 +35,7 @@ function GravitySettings(props: Props){
 				<p>Gravitational constant [<sup>Nm<sup>2</sup></sup>&frasl;<sub>kg<sup>2</sup></sub>]:</p>
 				<input
 					type="number"
-					defaultValue={defaultGconstant}
+					defaultValue={defaultGconstant.toExponential()}
 					step={1e-13}
 					onChange={updateGconstantHandler}
 				/>
@@ -45,7 +45,7 @@ function GravitySettings(props: Props){
 				<p>Big Mass [kg]:</p>
 				<input
 					type="number"
-					defaultValue={defaultBigMass}
+					defaultValue={defaultBigMass.toExponential()}
 					step={1e+18}
 					min={0}
 					onChange={updateBigMassHandler}

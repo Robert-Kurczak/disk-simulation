@@ -81,6 +81,11 @@ class SimulationCanvas{
 				6.67e-11,
 				new Vector2(this.width / 2, this.height / 2),
 				2e16
+			),
+			new GravityField(
+				6.67e-11,
+				new Vector2(this.width / 4, this.height / 4),
+				2e16
 			)
 		);
 
@@ -95,9 +100,10 @@ class SimulationCanvas{
 	}
 
 	//---Setters---
+	public setGravityFieldPosition(value: Vector2, fieldID: number){this.gravityFields[fieldID].fieldCenter = value}
 	public setDestructableDisks(value: boolean){this.destructableDisks = value}
-	public setGconstant(value: number){this.gravityFields[0].gConstant = value}
-	public setBigMass(value: number){this.gravityFields[0].mass = value}
+	public setGconstant(value: number, fieldID: number){this.gravityFields[fieldID].gConstant = value}
+	public setBigMass(value: number, fieldID: number){this.gravityFields[fieldID].mass = value;}
 	public setUseGravity(value: boolean){this.useGravity = value}
 
 	public setNormalViscosity(value: number){this.dragFields[0].normalViscosity = value}
@@ -110,10 +116,12 @@ class SimulationCanvas{
 	//---Getters---
 	public getWidth(){return this.width}
 	public getHeight(){return this.height}
+	public getGravityFieldsAmount(){return this.gravityFields.length}
+	public getGravityFieldPosition(fieldID: number){return this.gravityFields[fieldID].fieldCenter}
 
 	public getDestructableDisks(){return this.destructableDisks}
-	public getGconstant(){return this.gravityFields[0].gConstant}
-	public getBigMass(){return this.gravityFields[0].mass}
+	public getGconstant(fieldID: number){return this.gravityFields[fieldID].gConstant}
+	public getBigMass(fieldID: number){return this.gravityFields[fieldID].mass}
 	public getUseGravity(){return this.useGravity}
 	
 	public getNormalViscosity(){return this.dragFields[0].normalViscosity}
@@ -268,15 +276,12 @@ class SimulationCanvas{
 		for(let field of this.gravityFields){
 			for(let y = 0; y < this.height; y++){
 				for(let x = 0 ; x < this.width; x++){
-					const potential: number = field.gConstant * field.mass / (field.getDistance(new Vector2(x, y)) + 0.01);
-
-					//TODO scale based on max radius
-					const scaledPotential = potential / 100;
+					const normalizedPotential = (100 / (field.getDistance(new Vector2(x, y)) + 100)) * 255;
 
 					const index: number = (y * this.width + x) * 4;
 
 					//R
-					fieldImg.data[index + 0] += scaledPotential;
+					fieldImg.data[index + 0] += normalizedPotential;
 					//G
 					fieldImg.data[index + 1] = 0;
 					//B

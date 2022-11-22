@@ -3,79 +3,80 @@ import React from "react";
 interface Props{
 	canvasWidth: number;
 
-	defaultNormalViscosity: number;
-	updateNormalViscHandler: React.FormEventHandler<HTMLInputElement>;
+	normalViscosity: number;
+	updateNormalViscosity: React.FormEventHandler<HTMLInputElement>;
 
-	defaultMaxViscosity: number;
-	updateMaxViscHandler: React.FormEventHandler<HTMLInputElement>;
+	maxViscosity: number;
+	updateMaxViscosity: React.FormEventHandler<HTMLInputElement>;
 
-	defaultViscositySlope: number;
-	updateViscSlopeHandler: React.FormEventHandler<HTMLInputElement>;
+	viscositySlope: number;
+	updateViscositySlope: React.FormEventHandler<HTMLInputElement>;
 
-	defaultHighVpositionX: number;
-	updateHighVpositionXHandler: React.FormEventHandler<HTMLInputElement>;
+	highVpositionX: number;
+	updateHighVpositionX: React.FormEventHandler<HTMLInputElement>;
 
-	defaultVisualizeDrag: boolean;
-	updateVisualizeDragHandler: React.FormEventHandler<HTMLInputElement>;
+	visualizeDrag: boolean;
+	updateVisualizeDrag: React.FormEventHandler<HTMLInputElement>;
 }
 
 function DragSettings(props: Props){
 	const {
 		canvasWidth,
 
-		defaultNormalViscosity,
-		updateNormalViscHandler,
+		normalViscosity,
+		updateNormalViscosity,
 
-		defaultMaxViscosity,
-		updateMaxViscHandler,
+		maxViscosity,
+		updateMaxViscosity,
 
-		defaultViscositySlope,
-		updateViscSlopeHandler,
+		viscositySlope,
+		updateViscositySlope,
 
-		defaultHighVpositionX,
-		updateHighVpositionXHandler,
+		highVpositionX,
+		updateHighVpositionX,
 
-		defaultVisualizeDrag,
-		updateVisualizeDragHandler
+		visualizeDrag,
+		updateVisualizeDrag
 	} = props;
 
 
 	return(
 		<React.Fragment>
-			<div className="settings-section">
+			<div className="setting">
 				<p>Normal viscosity [Pa⋅s]:</p>
 				<input
 					type="number"
 					step={0.01}
 					
-					defaultValue={defaultNormalViscosity}
-					onChange={updateNormalViscHandler}
+					value={normalViscosity}
+					onChange={updateNormalViscosity}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Max viscosity [Pa⋅s]:</p>
 				<input
 					type="number"
 					step={0.01}
 					
-					defaultValue={defaultMaxViscosity}
-					onChange={updateMaxViscHandler}
+					value={maxViscosity}
+					onChange={updateMaxViscosity}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Viscosity slope:</p>
 				<input
 					type="number"
-					step={0.001}
+					step={0.00001}
+					min={0}
 
-					defaultValue={defaultViscositySlope}
-					onChange={updateViscSlopeHandler}
+					value={viscositySlope}
+					onChange={updateViscositySlope}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>High viscosity position</p>
 				<input
 					type="range"
@@ -83,17 +84,17 @@ function DragSettings(props: Props){
 					max={canvasWidth}
 					step={1}
 					
-					defaultValue={defaultHighVpositionX}
-					onChange={updateHighVpositionXHandler}
+					value={highVpositionX}
+					onChange={updateHighVpositionX}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Visualize field:</p>
 				<input
 					type="checkbox"
-					defaultChecked={defaultVisualizeDrag}
-					onClick={updateVisualizeDragHandler}
+					checked={visualizeDrag}
+					onChange={updateVisualizeDrag}
 				/>
 			</div>
 		</React.Fragment>

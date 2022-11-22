@@ -1,72 +1,144 @@
 import React from "react"
+import { Vector2 } from "../../MainCanvas/Simulation/Vector";
 
 interface Props{
-	defaultGconstant: number;
-	updateGconstantHandler: React.FormEventHandler<HTMLInputElement>;
+	bigMassAmount: number;
 
-	defaultBigMass: number;
-	updateBigMassHandler: React.FormEventHandler<HTMLInputElement>;
+	currentGravityFieldID: number;
+	updateCurrentGravityField: React.FormEventHandler<HTMLSelectElement>;
 
-	defaultDestDisks: boolean,
-	updateDestDisksHandler: React.FormEventHandler<HTMLInputElement>;
+	canvasWidth: number;
+	canvasHeight: number;
 
-	defaultVisualizeGravity: boolean,
-	updateVisualizeGravityHandler: React.FormEventHandler<HTMLInputElement>
+	currentGravityFieldPosition: Vector2;
+	updateCurrentGravityFieldPositionX: React.FormEventHandler<HTMLInputElement>;
+	updateCurrentGravityFieldPositionY: React.FormEventHandler<HTMLInputElement>;
+
+	gConstant: number;
+	updateGconstant: React.FormEventHandler<HTMLInputElement>;
+
+	bigMass: number;
+	updateBigMass: React.FormEventHandler<HTMLInputElement>;
+
+	destDisks: boolean;
+	updateDestDisks: React.FormEventHandler<HTMLInputElement>;
+
+	visualizeGravity: boolean;
+	updateVisualizeGravity: React.FormEventHandler<HTMLInputElement>;
+
 }
 
 function GravitySettings(props: Props){
 	const {
-		defaultGconstant,
-		updateGconstantHandler,
+		bigMassAmount,
 
-		defaultBigMass,
-		updateBigMassHandler,
+		currentGravityFieldID,
+		updateCurrentGravityField,
 
-		defaultDestDisks,
-		updateDestDisksHandler,
+		canvasWidth,
+		canvasHeight,
 
-		defaultVisualizeGravity,
-		updateVisualizeGravityHandler
+		currentGravityFieldPosition,
+		updateCurrentGravityFieldPositionX,
+		updateCurrentGravityFieldPositionY,
+
+		gConstant,
+		updateGconstant,
+
+		bigMass,
+		updateBigMass,
+
+		destDisks,
+		updateDestDisks,
+
+		visualizeGravity,
+		updateVisualizeGravity
 	}= props;
+
+	const bigMassArray = [];
+	for(let i = 0; i < bigMassAmount; i++){
+		bigMassArray.push(
+			<option key={i}>Big Mass {i}</option>
+		)
+	}
 
 	return(
 		<React.Fragment>
-			<div className="settings-section">
+			<div className="setting">
+				<p>Big mass number: </p>
+				<select onChange={updateCurrentGravityField}>
+					{
+						[...Array(bigMassAmount)].map((x, i) =>
+							<option selected={i === currentGravityFieldID} key={i}>Big mass {i}</option>
+						)
+					}
+				</select>
+			</div>
+
+			<div className="setting">
+				<p>Big mass X position: </p>
+				<input
+					type="range"
+					min={0}
+					max={canvasWidth}
+					step={1}
+					
+					value={currentGravityFieldPosition.x}
+					onChange={updateCurrentGravityFieldPositionX}
+				/>
+			</div>
+
+			<div className="setting">
+				<p>Big mass Y position: </p>
+				<input
+					type="range"
+					min={0}
+					max={canvasHeight}
+					step={1}
+					
+					value={currentGravityFieldPosition.y}
+					onChange={updateCurrentGravityFieldPositionY}
+				/>
+			</div>
+
+			<div className="setting">
 				<p>Gravitational constant [<sup>Nm<sup>2</sup></sup>&frasl;<sub>kg<sup>2</sup></sub>]:</p>
 				<input
 					type="number"
-					defaultValue={defaultGconstant.toExponential()}
 					step={1e-13}
-					onChange={updateGconstantHandler}
+
+					value={gConstant.toExponential()}
+					onChange={updateGconstant}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Big Mass [kg]:</p>
 				<input
 					type="number"
-					defaultValue={defaultBigMass.toExponential()}
 					step={1e+18}
 					min={0}
-					onChange={updateBigMassHandler}
+
+					value={bigMass.toExponential()}
+					onChange={updateBigMass}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Destructable disks:</p>
 				<input
 					type="checkbox"
-					defaultChecked={defaultDestDisks}
-					onClick={updateDestDisksHandler}
+					checked={destDisks}
+					onChange={updateDestDisks}
 				/>
 			</div>
 
-			<div className="settings-section">
+			<div className="setting">
 				<p>Visualize field:</p>
 				<input
 					type="checkbox"
-					defaultChecked={defaultVisualizeGravity}
-					onClick={updateVisualizeGravityHandler}
+					checked={visualizeGravity}
+					onChange={updateVisualizeGravity}
 				/>
 			</div>
 		</React.Fragment>

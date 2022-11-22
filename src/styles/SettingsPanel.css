@@ -1,7 +1,8 @@
 .settings-panel{
-	width: 20em;
-	font-size: 75%;
-	padding: 1% 2%;
+	width: 26em;
+	font-size: 80%;
+	padding: 1% 2% 5% 2%;
+	box-sizing: border-box;
 
 	text-align: center;
 	position: relative;
@@ -11,12 +12,17 @@
 }
 
 .settings-section{
+	max-height: 38em;
+	overflow: auto;
+}
+
+.setting{
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 }
 
-.settings-section input[type=number]{
+.setting input[type=number], .setting select{
 	width: 40%;
 	height: 25px;
 	background-color: #141414;
@@ -31,11 +37,11 @@
 	-moz-appearance: textfield;
 }
 
-.settings-section input[type=checkbox]{
+.setting input[type=checkbox]{
 	width: 40%;
 }
 
-.settings-section p{
+.setting p{
 	max-width: 50%;
 	margin: 4% 0%;
 	

@@ -20,7 +20,7 @@ class SimulationCanvas{
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
 
 	private deltaT = 0.004;
-	private destructableDisks = true;
+	private destructableDisks = false;
 
 	//---Gravity properties---
 	private gravityFields: Array<GravityField> = [];
@@ -80,11 +80,6 @@ class SimulationCanvas{
 			new GravityField(
 				6.67e-11,
 				new Vector2(this.width / 2, this.height / 2),
-				2e16
-			),
-			new GravityField(
-				6.67e-11,
-				new Vector2(this.width / 4, this.height / 4),
 				2e16
 			)
 		);
@@ -171,6 +166,20 @@ class SimulationCanvas{
 	//------
 
 	//---Public methods---
+	public addGravityField(){
+		this.gravityFields.push(
+			new GravityField(
+				6.67e-11,
+				new Vector2(this.width / 2, this.height / 2),
+				2e16
+			)
+		);
+	}
+
+	public removeGravityField(fieldID: number){
+		this.gravityFields.splice(fieldID, 1);
+	}
+
 	public simulate(diskAmount: number){
 		if(this.simulationInterval){
 			clearInterval(this.simulationInterval);

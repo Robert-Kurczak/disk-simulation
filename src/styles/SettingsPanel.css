@@ -75,3 +75,13 @@
 
 	display: inline-block;
 }
+
+.icon-buttons{
+	padding: 5px;
+	display: flex;
+	transition-duration: 0.3s;
+}
+
+.icon-buttons:hover{
+	background-color: #141414;
+}

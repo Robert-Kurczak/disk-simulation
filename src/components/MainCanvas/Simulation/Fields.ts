@@ -26,15 +26,9 @@ export class GravityField{
 		//value of distance vector
 		let distanceVal: number = ((distanceVec.x)**2 + (distanceVec.y)**2)**0.5;
 
-		//unit vector (versor) that show direction to big mass
-		let distanceVer: Vector2 = new Vector2(
-			distanceVec.x / distanceVal,
-			distanceVec.y / distanceVal
-		);
-
 		let acceleration: Vector2 = new Vector2(
-			(this.gConstant * this.mass) / (distanceVal**2 + 0.01) * distanceVer.x,
-			(this.gConstant * this.mass) / (distanceVal**2 + 0.01) * distanceVer.y
+			(this.gConstant * this.mass) / ((distanceVal**2 + 10))**1.5 * distanceVec.x,
+			(this.gConstant * this.mass) / ((distanceVal**2 + 10))**1.5 * distanceVec.y
 		);
 
 		return acceleration;
@@ -56,6 +50,7 @@ export class DragField{
 
 	public viscosityFromPosition(position: Vector2){
 		const quadricResult: number = -this.viscositySlope * (position.x - this.highVpositionX)**2 + this.maxViscosity;
+		
 		return Math.max(this.normalViscosity, quadricResult);
 	}
 

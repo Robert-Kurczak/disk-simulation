@@ -43,6 +43,34 @@ function SettingsPanel(props: Props){
 		setDisksAmount(value);
 	}
 
+	const addGravityField = () => {
+		mainCanvas.addGravityField();
+		const newID = mainCanvas.getGravityFieldsAmount() - 1;
+
+		setCurrentGravityField({
+			ID: newID,
+			position: mainCanvas.getGravityFieldPosition(newID),
+			gConstant: mainCanvas.getGconstant(newID),
+			bigMass: mainCanvas.getBigMass(newID)
+		});
+
+		if(visualizeGravity){mainCanvas.printGravityFieldImg()}
+	}
+
+	const removeGravityField = () => {
+		if(mainCanvas.getGravityFieldsAmount() > 1){
+			mainCanvas.removeGravityField(currentGravityField.ID);
+			setCurrentGravityField({
+				ID: 0,
+				position: mainCanvas.getGravityFieldPosition(0),
+				gConstant: mainCanvas.getGconstant(0),
+				bigMass: mainCanvas.getBigMass(0)
+			});
+
+			if(visualizeGravity){mainCanvas.printGravityFieldImg()}
+		}
+	}
+
 	const updateCurrentGravityField = (e: ChangeEvent<HTMLSelectElement>) => {
 		const value: number = e.target.selectedIndex;
 
@@ -84,6 +112,14 @@ function SettingsPanel(props: Props){
 		const value: boolean = e.target.checked;
 
 		mainCanvas.setUseGravity(value);
+
+		if(value){
+			if(visualizeGravity) mainCanvas.printGravityFieldImg();
+		}
+		else{
+			if(visualizeGravity) mainCanvas.clearGravityFieldImg();
+		}
+
 		setUseGravity(value);
 	}
 
@@ -131,6 +167,14 @@ function SettingsPanel(props: Props){
 		const value: boolean = e.target.checked;
 
 		mainCanvas.setUseDrag(value);
+
+		if(value){
+			if(visualizeDrag) mainCanvas.printDragFieldImg();
+		}
+		else{
+			if(visualizeDrag) mainCanvas.clearDragFieldImg();
+		}
+
 		setUseDrag(value);
 	}
 
@@ -207,6 +251,9 @@ function SettingsPanel(props: Props){
 				{useGravity &&
 					<GravitySettings
 						bigMassAmount={mainCanvas.getGravityFieldsAmount()}
+
+						addGravityField={addGravityField}
+						removeGravityField={removeGravityField}
 
 						canvasWidth={mainCanvas.getWidth()}
 						canvasHeight={mainCanvas.getHeight()}

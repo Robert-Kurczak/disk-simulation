@@ -1,11 +1,18 @@
 import React from "react"
 import { Vector2 } from "../../MainCanvas/Simulation/Vector";
+import { 
+	MdDelete,
+	MdAdd
+} from "react-icons/md"
 
 interface Props{
 	bigMassAmount: number;
 
 	currentGravityFieldID: number;
 	updateCurrentGravityField: React.FormEventHandler<HTMLSelectElement>;
+
+	addGravityField: () => void;
+	removeGravityField: () => void;
 
 	canvasWidth: number;
 	canvasHeight: number;
@@ -35,6 +42,9 @@ function GravitySettings(props: Props){
 		currentGravityFieldID,
 		updateCurrentGravityField,
 
+		addGravityField,
+		removeGravityField,
+
 		canvasWidth,
 		canvasHeight,
 
@@ -55,21 +65,23 @@ function GravitySettings(props: Props){
 		updateVisualizeGravity
 	}= props;
 
-	const bigMassArray = [];
-	for(let i = 0; i < bigMassAmount; i++){
-		bigMassArray.push(
-			<option key={i}>Big Mass {i}</option>
-		)
-	}
-
 	return(
 		<React.Fragment>
 			<div className="setting">
 				<p>Big mass number: </p>
-				<select onChange={updateCurrentGravityField}>
+
+				<div className="icon-buttons" onClick={addGravityField}>
+					<MdAdd/>
+				</div>
+
+				<div className="icon-buttons" onClick={removeGravityField}>
+					<MdDelete/>
+				</div>
+
+				<select value={currentGravityFieldID} onChange={updateCurrentGravityField}>
 					{
 						[...Array(bigMassAmount)].map((x, i) =>
-							<option selected={i === currentGravityFieldID} key={i}>Big mass {i}</option>
+							<option value={i} key={i}>Big mass {i}</option>
 						)
 					}
 				</select>
@@ -107,7 +119,7 @@ function GravitySettings(props: Props){
 					type="number"
 					step={1e-13}
 
-					value={gConstant.toExponential()}
+					value={gConstant}
 					onChange={updateGconstant}
 				/>
 			</div>
@@ -119,7 +131,7 @@ function GravitySettings(props: Props){
 					step={1e+18}
 					min={0}
 
-					value={bigMass.toExponential()}
+					value={bigMass}
 					onChange={updateBigMass}
 				/>
 			</div>

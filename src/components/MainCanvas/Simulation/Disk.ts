@@ -14,8 +14,6 @@ class Disk{
 		this.velocity = velocity
 		this.color = color;
 	}
-
-	public toDestroy: boolean = false;
 }
 
 export default Disk;

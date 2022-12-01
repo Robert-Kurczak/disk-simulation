@@ -20,6 +20,8 @@ class SimulationCanvas{
 	private simulationInterval: ReturnType<typeof setInterval> | null = null;
 
 	private deltaT = 0.004;
+
+	private disksCollisions = false;
 	private destructableDisks = false;
 
 	//---Gravity properties---
@@ -95,6 +97,7 @@ class SimulationCanvas{
 	}
 
 	//---Setters---
+	public setDisksCollision(value: boolean){this.disksCollisions = value}
 	public setGravityFieldPosition(value: Vector2, fieldID: number){this.gravityFields[fieldID].fieldCenter = value}
 	public setDestructableDisks(value: boolean){this.destructableDisks = value}
 	public setGconstant(value: number, fieldID: number){this.gravityFields[fieldID].gConstant = value}
@@ -114,6 +117,7 @@ class SimulationCanvas{
 	public getGravityFieldsAmount(){return this.gravityFields.length}
 	public getGravityFieldPosition(fieldID: number){return this.gravityFields[fieldID].fieldCenter}
 
+	public getDisksCollisions(){return this.disksCollisions}
 	public getDestructableDisks(){return this.destructableDisks}
 	public getGconstant(fieldID: number){return this.gravityFields[fieldID].gConstant}
 	public getBigMass(fieldID: number){return this.gravityFields[fieldID].mass}
@@ -191,19 +195,77 @@ class SimulationCanvas{
 			this.canvasCTX.clearRect(0, 0, this.width, this.height);
 			this.drawDisks(diskArray);
 
-			// this.canvasCTX.beginPath();
-			// this.canvasCTX.arc(
-			// 	this.gravityFields[0].fieldCenter.x,
-			// 	this.gravityFields[0].fieldCenter.y,
-			// 	5,
-			// 	0,
-			// 	2 * Math.PI
-			// );
-			// this.canvasCTX.fillStyle = "#ff0044";
-			// this.canvasCTX.fill();
-
 			for(let i = diskArray.length - 1; i >= 0; i--){
 				const disk = diskArray[i];
+
+				if(this.disksCollisions){
+					for(let j = 0; j < diskArray.length; j++){
+						if(i !== j){
+							const diskB = diskArray[j];
+
+							let distance = ((disk.position.x - diskB.position.x)**2 + (disk.position.y - diskB.position.y)**2)**0.5;
+
+							if((distance - disk.radius - diskB.radius) <= 0){
+								if(distance < Math.max(disk.radius, diskB.radius)){
+									const velocityValue = (diskB.velocity.x**2 + diskB.velocity.y**2)**0.5;
+									const velocityVersor = new Vector2(
+										diskB.velocity.x / velocityValue,
+										diskB.velocity.y / velocityValue
+									);
+	
+									const deltaR = 2 * Math.min(disk.radius, diskB.radius);
+	
+									diskB.position.x -= velocityVersor.x * deltaR;
+									diskB.position.y -= velocityVersor.y * deltaR;
+									distance += deltaR;
+								}
+
+								//Normal versor
+								const normalUnitVec = new Vector2(
+									(diskB.position.x - disk.position.x) / distance,
+									(diskB.position.y - disk.position.y) / distance
+								);
+
+								//Tangent versor
+								const tangentUnitVec = new Vector2(-normalUnitVec.y, normalUnitVec.x);
+
+								//Scalar velocities in normal direction
+								const normalVelA = disk.velocity.x * normalUnitVec.x + disk.velocity.y * normalUnitVec.y
+								const normalVelB = diskB.velocity.x * normalUnitVec.x + diskB.velocity.y * normalUnitVec.y
+
+								//Scalar velocities in tangent direction
+								const tangentVelA = disk.velocity.x * tangentUnitVec.x + disk.velocity.y * tangentUnitVec.y
+								const tangentVelB = diskB.velocity.x * tangentUnitVec.x + diskB.velocity.y * tangentUnitVec.y
+
+								//Vector velocities in tangent direction 
+								const resultTangentVelA = new Vector2(
+									tangentVelA * tangentUnitVec.x,
+									tangentVelA * tangentUnitVec.y
+								);
+
+								const resultTangentVelB = new Vector2(
+									tangentVelB * tangentUnitVec.x,
+									tangentVelB * tangentUnitVec.y
+								);
+							
+								//Scalar values of velocities in normal direction after collision
+								const resultNormalVelA = (normalVelA * (disk.mass - diskB.mass) + 2 * diskB.mass * normalVelB) / (disk.mass + diskB.mass);
+								const resultNormalVelB = (normalVelB * (diskB.mass - disk.mass) + 2 * disk.mass * normalVelA) / (disk.mass + diskB.mass);
+
+								//Vector values of velocities after collision
+								disk.velocity = new Vector2(
+									resultNormalVelA * normalUnitVec.x + resultTangentVelA.x,
+									resultNormalVelA * normalUnitVec.y + resultTangentVelA.y,
+								);
+
+								diskB.velocity = new Vector2(
+									resultNormalVelB * normalUnitVec.x + resultTangentVelB.x,
+									resultNormalVelB * normalUnitVec.y + resultTangentVelB.y,
+								);
+							}
+						}
+					}
+				}
 
 				//Removing disk that are too close to big mass
 				if(this.destructableDisks && this.useGravity){
@@ -265,16 +327,6 @@ class SimulationCanvas{
 				}
 				//------
 			}
-
-			//Cleaning from dead particles
-			if(this.destructableDisks && this.useGravity){
-				for(let i = 0; i < diskArray.length; i++){
-					if(diskArray[i].toDestroy){
-						diskArray.splice(i, 1);
-					}
-				}
-			}
-
 		}, this.deltaT * 1000);
 	}
 

@@ -15,6 +15,8 @@ function SettingsPanel(props: Props){
 
 	
 	//---Single source of truth---
+	const [disksCollisions, setDisksCollisions] = useState(mainCanvas.getDisksCollisions());
+
 	const [disksAmount, setDisksAmount] = useState(200);
 	const [useGravity, setUseGravity] = useState(mainCanvas.getUseGravity());
 	
@@ -37,6 +39,14 @@ function SettingsPanel(props: Props){
 	//------
 
 	//---Updaters---
+	const updateDisksCollisions = (e: ChangeEvent<HTMLInputElement>) => {
+		const value: boolean = e.target.checked;
+
+		mainCanvas.setDisksCollision(value);
+
+		setDisksCollisions(value);
+	}
+
 	//-Gravity-
 	const updateDisksAmount = (e: ChangeEvent<HTMLInputElement>) => {
 		const value: number = parseInt(e.target.value);
@@ -241,6 +251,11 @@ function SettingsPanel(props: Props){
 				<div className="setting">
 					<p>Disks amount:</p>
 					<input type="number" value={disksAmount} onChange={updateDisksAmount}/>
+				</div>
+
+				<div className="setting">
+					<p>Disks collisions: </p>
+					<input type="checkbox" checked={disksCollisions} onChange={updateDisksCollisions}/>
 				</div>
 
 				<div className="setting">

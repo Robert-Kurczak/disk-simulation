@@ -135,10 +135,10 @@ class SimulationCanvas{
 		const diskArray: Array<Disk> = [];
 
 		for(let i = 0; i < diskAmount; i++){
-			const randRadius: number = Math.random() * this.width / 100;
-
 			const randMass: number = (Math.random() * 19 + 1);
-
+			
+			const randRadius: number = randMass / 2;
+			
 			const randPosition: Vector2 = new Vector2(
 				Math.random() * (this.width -2 * randRadius) + randRadius,
 				Math.random() * (this.height -2 * randRadius) + randRadius
@@ -206,18 +206,19 @@ class SimulationCanvas{
 							let distance = ((disk.position.x - diskB.position.x)**2 + (disk.position.y - diskB.position.y)**2)**0.5;
 
 							if((distance - disk.radius - diskB.radius) <= 0){
-								if(distance < Math.max(disk.radius, diskB.radius)){
+
+								if(distance - disk.radius - diskB.radius < 0){
 									const velocityValue = (diskB.velocity.x**2 + diskB.velocity.y**2)**0.5;
 									const velocityVersor = new Vector2(
 										diskB.velocity.x / velocityValue,
 										diskB.velocity.y / velocityValue
 									);
-	
-									const deltaR = 2 * Math.min(disk.radius, diskB.radius);
-	
+
+									const deltaR = disk.radius - (distance - diskB.radius);
+
 									diskB.position.x -= velocityVersor.x * deltaR;
 									diskB.position.y -= velocityVersor.y * deltaR;
-									distance += deltaR;
+									distance += deltaR * 1.1;
 								}
 
 								//Normal versor
